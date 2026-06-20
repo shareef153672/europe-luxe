@@ -1,0 +1,40 @@
+{
+  "hero_title": "Luxusné zážitky v Európe",
+  "hero_subtitle": "Starostlivo vytvorené prémiové cesty pre moderných cestovateľov.",
+  "explore_button": "Preskúmať balíky",
+
+  "why_choose": "Prečo si vybrať nás",
+  "premium_hotels": "Prémiové hotely",
+  "premium_hotels_desc": "Starostlivo vybrané 4 a 5-hviezdičkové ubytovanie.",
+  "expert_guides": "Skúsení sprievodcovia",
+  "expert_guides_desc": "Miestni odborníci pre autentické kultúrne zážitky.",
+  "secure_payments": "Bezpečné platby",
+  "secure_payments_desc": "Plne zabezpečená medzinárodná platba cez Stripe.",
+
+  "featured": "Odporúčané destinácie",
+
+  "packages_title": "Luxusné európske balíky",
+  "view_details": "Zobraziť detaily",
+
+  "paris_rome_title": "Paríž a Rím – Luxusný zážitok",
+  "paris_rome_desc": "Zažite krásne európske mestá s historickou architektúrou, romantickými ulicami a ikonickými pamiatkami v Paríži a Ríme.",
+
+  "trip_highlights": "Hlavné body zájazdu",
+  "highlight_1": "Návšteva Eiffelovej veže",
+  "highlight_2": "Zážitok v Koloseu",
+  "highlight_3": "Prehliadka múzea Louvre",
+  "highlight_4": "Prechádzka Vatikánom",
+
+  "inclusions": "Zahrnuté služby",
+  "exclusions": "Nezahrnuté služby",
+
+  "inc_1": "4-hviezdičkový hotel",
+  "inc_2": "Denné raňajky",
+  "inc_3": "Miestne sprievodcovské služby",
+
+  "exc_1": "Medzinárodné lety",
+  "exc_2": "Poplatky za víza",
+  "exc_3": "Cestovné poistenie",
+
+  "book_now": "Rezervovať teraz"
+}

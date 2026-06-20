@@ -1,0 +1,40 @@
+{
+  "hero_title": "Luxury Experiences in Europe",
+  "hero_subtitle": "Carefully curated premium journeys for modern travelers.",
+  "explore_button": "Explore Packages",
+
+  "why_choose": "Why Choose Us",
+  "premium_hotels": "Premium Hotels",
+  "premium_hotels_desc": "Handpicked 4 & 5-star accommodations for unmatched comfort.",
+  "expert_guides": "Expert Guides",
+  "expert_guides_desc": "Local experts ensuring authentic cultural experiences.",
+  "secure_payments": "Secure Payments",
+  "secure_payments_desc": "Fully secure Stripe-powered international checkout.",
+
+  "featured": "Featured Destinations",
+
+  "packages_title": "Luxury Europe Packages",
+  "view_details": "View Details",
+
+  "paris_rome_title": "Paris & Rome Delight",
+  "paris_rome_desc": "Experience beautiful European locations with historic architecture, romantic streets, and iconic landmarks across Paris and Rome.",
+
+  "trip_highlights": "Trip Highlights",
+  "highlight_1": "Eiffel Tower Visit",
+  "highlight_2": "Colosseum Experience",
+  "highlight_3": "Louvre Museum Tour",
+  "highlight_4": "Vatican City Walk",
+
+  "inclusions": "Inclusions",
+  "exclusions": "Exclusions",
+
+  "inc_1": "4-Star Hotel Stay",
+  "inc_2": "Daily Breakfast",
+  "inc_3": "Local Guided Tours",
+
+  "exc_1": "International Flights",
+  "exc_2": "Visa Fees",
+  "exc_3": "Travel Insurance",
+
+  "book_now": "Book Now"
+}

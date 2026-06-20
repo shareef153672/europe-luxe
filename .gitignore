@@ -1,4 +1,36 @@
-node_modules
+# dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# environment files
 .env
-dist
-build
+client/.env
+server/.env
+
+# build outputs
+dist/
+build/
+client/dist/
+client/build/
+server/dist/
+server/build/
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# installers
+*.msi
+*.exe
+
+# local enquiry/customer data
+server/data/
