@@ -1,15 +1,15 @@
-const admin = require("firebase-admin");
+const { initializeApp, getApps, applicationDefault } = require("firebase-admin/app");
+const { getFirestore } = require("firebase-admin/firestore");
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
+if (!getApps().length) {
+  initializeApp({
+    credential: applicationDefault(),
     projectId: process.env.GOOGLE_CLOUD_PROJECT,
   });
 }
 
-const db = admin.firestore();
+const db = getFirestore();
 
 module.exports = {
-  admin,
   db,
 };
