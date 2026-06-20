@@ -34,7 +34,7 @@ export default function Contact() {
     setErrorMessage("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/enquiry", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/enquiry`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

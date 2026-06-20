@@ -53,7 +53,7 @@ export default function PackageDetails() {
   const handleCheckout = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/create-checkout-session",
+        `${import.meta.env.VITE_API_BASE_URL}/api/create-checkout-session`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

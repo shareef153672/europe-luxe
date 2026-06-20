@@ -13,7 +13,7 @@ export default function AdminEnquiries() {
       setLoading(true);
       setErrorMessage("");
 
-      const response = await fetch("http://localhost:5000/api/enquiries", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/enquiries`, {
         headers: {
           "x-admin-api-key": "dev-admin-secret-123",
         },
