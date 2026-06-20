@@ -1,21 +1,7 @@
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
+const { db } = require("../config/firebase");
 
 const router = express.Router();
-
-const dataDir = path.join(__dirname, "../../data");
-const enquiriesFile = path.join(dataDir, "enquiries.json");
-
-function ensureDataFileExists() {
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-
-  if (!fs.existsSync(enquiriesFile)) {
-    fs.writeFileSync(enquiriesFile, "[]", "utf-8");
-  }
-}
 
 function validateAdminApiKey(req, res, next) {
   const adminApiKey = req.headers["x-admin-api-key"];
@@ -39,10 +25,8 @@ function validateAdminApiKey(req, res, next) {
 }
 
 // Public route - website users can submit enquiries
-router.post("/enquiry", (req, res) => {
+router.post("/enquiry", async (req, res) => {
   try {
-    ensureDataFileExists();
-
     const {
       name,
       phone,
@@ -79,10 +63,7 @@ router.post("/enquiry", (req, res) => {
       });
     }
 
-    const enquiries = JSON.parse(fs.readFileSync(enquiriesFile, "utf-8"));
-
     const newEnquiry = {
-      id: Date.now().toString(),
       name: name.trim(),
       phone: phone.trim(),
       email: email.trim().toLowerCase(),
@@ -94,14 +75,15 @@ router.post("/enquiry", (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
-    enquiries.push(newEnquiry);
-
-    fs.writeFileSync(enquiriesFile, JSON.stringify(enquiries, null, 2));
+    const docRef = await db.collection("enquiries").add(newEnquiry);
 
     return res.status(201).json({
       success: true,
       message: "Enquiry submitted successfully.",
-      enquiry: newEnquiry,
+      enquiry: {
+        id: docRef.id,
+        ...newEnquiry,
+      },
     });
   } catch (error) {
     console.error("Enquiry API error:", error);
@@ -114,11 +96,17 @@ router.post("/enquiry", (req, res) => {
 });
 
 // Protected route - only admin dashboard should fetch enquiries
-router.get("/enquiries", validateAdminApiKey, (req, res) => {
+router.get("/enquiries", validateAdminApiKey, async (req, res) => {
   try {
-    ensureDataFileExists();
+    const snapshot = await db
+      .collection("enquiries")
+      .orderBy("createdAt", "desc")
+      .get();
 
-    const enquiries = JSON.parse(fs.readFileSync(enquiriesFile, "utf-8"));
+    const enquiries = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
     return res.json({
       success: true,
