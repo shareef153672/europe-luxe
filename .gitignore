@@ -34,3 +34,9 @@ Thumbs.db
 
 # local enquiry/customer data
 server/data/
+
+# Firebase local cache
+client/.firebase/
+
+# Local frontend environment files
+client/.env.production

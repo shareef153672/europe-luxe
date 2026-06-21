@@ -9,26 +9,30 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://europe-tourz.web.app",
+  "https://europe-tourz.firebaseapp.com",
   "https://europetourz.com",
   "https://www.europetourz.com",
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin like Postman, curl, server-to-server calls
+    origin(origin, callback) {
+      // Allow browser requests from approved origins.
+      // Also allow tools such as Postman, curl, health checks,
+      // and server-to-server requests that may not send an Origin header.
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
+        return callback(null, true);
       }
+
+      return callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "x-admin-api-key"],
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 
 app.use("/api", checkoutRoute);
 app.use("/api", enquiryRoutes);
@@ -36,29 +40,46 @@ app.use("/api", enquiryRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "Europe Luxe API Running 🚀",
+    message: "Europe Tourz API Running 🚀",
   });
 });
 
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
-    message: "Europe Luxe API is healthy",
+    message: "Europe Tourz API is healthy",
+    environment: process.env.NODE_ENV || "development",
     timestamp: new Date().toISOString(),
   });
 });
 
-app.use((err, req, res, next) => {
-  console.error("Server error:", err.message);
+// Handle unknown API routes
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "API route not found.",
+  });
+});
 
-  res.status(500).json({
+// Central error handler
+app.use((err, req, res, next) => {
+  console.error("Server error:", err);
+
+  if (err.message === "Not allowed by CORS") {
+    return res.status(403).json({
+      success: false,
+      message: "Request origin is not allowed.",
+    });
+  }
+
+  return res.status(500).json({
     success: false,
     message: "Internal server error.",
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
