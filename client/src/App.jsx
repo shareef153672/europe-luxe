@@ -12,6 +12,11 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminEnquiries from "./pages/AdminEnquiries";
 import Success from "./pages/Success";
 
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
+import CancellationPolicy from "./pages/CancellationPolicy";
+import PaymentPolicy from "./pages/PaymentPolicy";
+
 function PageTransition({ children }) {
   return (
     <motion.div
@@ -91,6 +96,42 @@ function App() {
               element={
                 <PageTransition>
                   <Contact />
+                </PageTransition>
+              }
+            />
+
+            <Route
+              path="/privacy-policy"
+              element={
+                <PageTransition>
+                  <PrivacyPolicy />
+                </PageTransition>
+              }
+            />
+
+            <Route
+              path="/terms"
+              element={
+                <PageTransition>
+                  <Terms />
+                </PageTransition>
+              }
+            />
+
+            <Route
+              path="/cancellation-policy"
+              element={
+                <PageTransition>
+                  <CancellationPolicy />
+                </PageTransition>
+              }
+            />
+
+            <Route
+              path="/payment-policy"
+              element={
+                <PageTransition>
+                  <PaymentPolicy />
                 </PageTransition>
               }
             />
