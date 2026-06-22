@@ -1,30 +1,10 @@
 const express = require("express");
 const { db } = require("../config/firebase");
+const authenticateAdmin = require("../middleware/auth");
 
 const router = express.Router();
 
-function validateAdminApiKey(req, res, next) {
-  const adminApiKey = req.headers["x-admin-api-key"];
-  const expectedApiKey = process.env.ADMIN_API_KEY;
-
-  if (!expectedApiKey) {
-    return res.status(500).json({
-      success: false,
-      message: "Admin API key is not configured on the server.",
-    });
-  }
-
-  if (!adminApiKey || adminApiKey !== expectedApiKey) {
-    return res.status(401).json({
-      success: false,
-      message: "Unauthorized access. Valid admin API key is required.",
-    });
-  }
-
-  next();
-}
-
-// Public route - website users can submit enquiries
+// Public route: website users can submit enquiries
 router.post("/enquiry", async (req, res) => {
   try {
     const {
@@ -95,8 +75,8 @@ router.post("/enquiry", async (req, res) => {
   }
 });
 
-// Protected route - only admin dashboard should fetch enquiries
-router.get("/enquiries", validateAdminApiKey, async (req, res) => {
+// Protected route: only authenticated admins can read enquiries
+router.get("/enquiries", authenticateAdmin, async (req, res) => {
   try {
     const snapshot = await db
       .collection("enquiries")

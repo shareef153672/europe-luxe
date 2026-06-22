@@ -4,6 +4,7 @@ require("dotenv").config();
 
 const checkoutRoute = require("./routes/checkout");
 const enquiryRoutes = require("./routes/enquiry");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 
@@ -18,9 +19,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin(origin, callback) {
-      // Allow browser requests from approved origins.
-      // Also allow tools such as Postman, curl, health checks,
-      // and server-to-server requests that may not send an Origin header.
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
@@ -28,7 +26,10 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "x-admin-api-key"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
   })
 );
 
@@ -36,6 +37,7 @@ app.use(express.json({ limit: "1mb" }));
 
 app.use("/api", checkoutRoute);
 app.use("/api", enquiryRoutes);
+app.use("/api", authRoutes);
 
 app.get("/", (req, res) => {
   res.json({
@@ -53,7 +55,6 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Handle unknown API routes
 app.use("/api", (req, res) => {
   res.status(404).json({
     success: false,
@@ -61,7 +62,6 @@ app.use("/api", (req, res) => {
   });
 });
 
-// Central error handler
 app.use((err, req, res, next) => {
   console.error("Server error:", err);
 

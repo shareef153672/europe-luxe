@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
 import Navbar from "./layout/Navbar";
@@ -18,7 +18,7 @@ function PageTransition({ children }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.45 }}
     >
       {children}
     </motion.div>
@@ -26,14 +26,27 @@ function PageTransition({ children }) {
 }
 
 function ProtectedAdminRoute({ children }) {
-  const isAdminLoggedIn =
-    localStorage.getItem("europeLuxeAdminAuth") === "true";
+  const token = localStorage.getItem("europeTourzAdminToken");
 
-  if (!isAdminLoggedIn) {
+  if (!token) {
     return <Navigate to="/admin/login" replace />;
   }
 
   return children;
+}
+
+function AdminLoginRoute() {
+  const token = localStorage.getItem("europeTourzAdminToken");
+
+  if (token) {
+    return <Navigate to="/admin/enquiries" replace />;
+  }
+
+  return (
+    <PageTransition>
+      <AdminLogin />
+    </PageTransition>
+  );
 }
 
 function App() {
@@ -43,7 +56,7 @@ function App() {
     <>
       <Navbar />
 
-      <main className="pt-24 min-h-screen bg-[#070b14]">
+      <main className="min-h-screen bg-[#070b14] pt-24">
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route
@@ -82,14 +95,7 @@ function App() {
               }
             />
 
-            <Route
-              path="/admin/login"
-              element={
-                <PageTransition>
-                  <AdminLogin />
-                </PageTransition>
-              }
-            />
+            <Route path="/admin/login" element={<AdminLoginRoute />} />
 
             <Route
               path="/admin/enquiries"
@@ -110,6 +116,8 @@ function App() {
                 </PageTransition>
               }
             />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AnimatePresence>
       </main>
