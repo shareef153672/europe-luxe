@@ -40,3 +40,5 @@ client/.firebase/
 
 # Local frontend environment files
 client/.env.production
+
+cloudrun-env.yaml
