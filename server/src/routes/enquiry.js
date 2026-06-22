@@ -1,6 +1,11 @@
 const express = require("express");
 const { db } = require("../config/firebase");
 const authenticateAdmin = require("../middleware/auth");
+const { sendEmail } = require("../services/email");
+const {
+  buildCustomerConfirmationEmail,
+  buildAdminNotificationEmail,
+} = require("../templates/enquiryEmails");
 
 const router = express.Router();
 
@@ -57,18 +62,77 @@ router.post("/enquiry", async (req, res) => {
       message: message ? message.trim() : "",
       status: "new",
       adminNotes: "",
+      emailNotificationStatus: "pending",
       createdAt: currentTime,
       updatedAt: currentTime,
     };
 
+    // Save enquiry first so customer data is never lost if email fails.
     const docRef = await db.collection("enquiries").add(newEnquiry);
+
+    const savedEnquiry = {
+      id: docRef.id,
+      ...newEnquiry,
+    };
+
+    const customerEmail = buildCustomerConfirmationEmail(savedEnquiry);
+    const adminEmail = buildAdminNotificationEmail(savedEnquiry);
+
+    const emailResults = await Promise.allSettled([
+      sendEmail({
+        to: savedEnquiry.email,
+        subject: customerEmail.subject,
+        html: customerEmail.html,
+        text: customerEmail.text,
+      }),
+
+      sendEmail({
+        to: process.env.ADMIN_NOTIFICATION_EMAIL,
+        subject: adminEmail.subject,
+        html: adminEmail.html,
+        text: adminEmail.text,
+      }),
+    ]);
+
+    const customerEmailSent = emailResults[0].status === "fulfilled";
+    const adminEmailSent = emailResults[1].status === "fulfilled";
+
+    if (!customerEmailSent) {
+      console.error(
+        "Customer confirmation email failed:",
+        emailResults[0].reason
+      );
+    }
+
+    if (!adminEmailSent) {
+      console.error(
+        "Admin notification email failed:",
+        emailResults[1].reason
+      );
+    }
+
+    const emailNotificationStatus =
+      customerEmailSent && adminEmailSent
+        ? "sent"
+        : customerEmailSent || adminEmailSent
+          ? "partial"
+          : "failed";
+
+    await docRef.update({
+      customerEmailSent,
+      adminEmailSent,
+      emailNotificationStatus,
+      emailProcessedAt: new Date().toISOString(),
+    });
 
     return res.status(201).json({
       success: true,
       message: "Enquiry submitted successfully.",
       enquiry: {
-        id: docRef.id,
-        ...newEnquiry,
+        ...savedEnquiry,
+        customerEmailSent,
+        adminEmailSent,
+        emailNotificationStatus,
       },
     });
   } catch (error) {
@@ -130,10 +194,7 @@ router.patch("/enquiries/:id", authenticateAdmin, async (req, res) => {
       });
     }
 
-    if (
-      adminNotes !== undefined &&
-      typeof adminNotes !== "string"
-    ) {
+    if (adminNotes !== undefined && typeof adminNotes !== "string") {
       return res.status(400).json({
         success: false,
         message: "Admin notes must be text.",
