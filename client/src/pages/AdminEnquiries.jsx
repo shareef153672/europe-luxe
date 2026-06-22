@@ -1,25 +1,44 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const STATUS_OPTIONS = ["new", "contacted", "confirmed", "closed"];
+
 function AdminEnquiries() {
   const navigate = useNavigate();
 
   const [enquiries, setEnquiries] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [packageFilter, setPackageFilter] = useState("all");
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [updatingId, setUpdatingId] = useState("");
+  const [deletingId, setDeletingId] = useState("");
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const logoutAdmin = useCallback(() => {
     localStorage.removeItem("europeTourzAdminToken");
     navigate("/admin/login", { replace: true });
   }, [navigate]);
 
+  const getToken = useCallback(() => {
+    const token = localStorage.getItem("europeTourzAdminToken");
+
+    if (!token) {
+      logoutAdmin();
+      return null;
+    }
+
+    return token;
+  }, [logoutAdmin]);
+
   const fetchEnquiries = useCallback(
     async (isRefresh = false) => {
-      const token = localStorage.getItem("europeTourzAdminToken");
+      const token = getToken();
 
       if (!token) {
-        logoutAdmin();
         return;
       }
 
@@ -30,6 +49,7 @@ function AdminEnquiries() {
       }
 
       setError("");
+      setSuccessMessage("");
 
       try {
         const response = await fetch(
@@ -42,13 +62,7 @@ function AdminEnquiries() {
           }
         );
 
-        let data = {};
-
-        try {
-          data = await response.json();
-        } catch {
-          data = {};
-        }
+        const data = await readJsonResponse(response);
 
         if (response.status === 401 || response.status === 403) {
           logoutAdmin();
@@ -67,77 +81,272 @@ function AdminEnquiries() {
 
         setError(
           fetchError.message ||
-            "Backend is not reachable. Please try again later."
+            "Unable to reach the backend. Please try again."
         );
       } finally {
         setLoading(false);
         setRefreshing(false);
       }
     },
-    [logoutAdmin]
+    [getToken, logoutAdmin]
   );
 
   useEffect(() => {
     fetchEnquiries();
   }, [fetchEnquiries]);
 
+  const updateEnquiry = async (enquiryId, updates) => {
+    const token = getToken();
+
+    if (!token) {
+      return;
+    }
+
+    setUpdatingId(enquiryId);
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/enquiries/${enquiryId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updates),
+        }
+      );
+
+      const data = await readJsonResponse(response);
+
+      if (response.status === 401 || response.status === 403) {
+        logoutAdmin();
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to update enquiry.");
+      }
+
+      setEnquiries((currentEnquiries) =>
+        currentEnquiries.map((enquiry) =>
+          enquiry.id === enquiryId ? data.enquiry : enquiry
+        )
+      );
+
+      setSuccessMessage("Enquiry updated successfully.");
+    } catch (updateError) {
+      console.error("Update enquiry error:", updateError);
+      setError(updateError.message || "Unable to update enquiry.");
+    } finally {
+      setUpdatingId("");
+    }
+  };
+
+  const handleStatusChange = async (enquiryId, status) => {
+    await updateEnquiry(enquiryId, { status });
+  };
+
+  const handleNotesSave = async (enquiryId, adminNotes) => {
+    await updateEnquiry(enquiryId, { adminNotes });
+  };
+
+  const handleDelete = async (enquiry) => {
+    const shouldDelete = window.confirm(
+      `Delete enquiry from ${enquiry.name || "this customer"}? This cannot be undone.`
+    );
+
+    if (!shouldDelete) {
+      return;
+    }
+
+    const token = getToken();
+
+    if (!token) {
+      return;
+    }
+
+    setDeletingId(enquiry.id);
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/enquiries/${enquiry.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await readJsonResponse(response);
+
+      if (response.status === 401 || response.status === 403) {
+        logoutAdmin();
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to delete enquiry.");
+      }
+
+      setEnquiries((currentEnquiries) =>
+        currentEnquiries.filter(
+          (currentEnquiry) => currentEnquiry.id !== enquiry.id
+        )
+      );
+
+      setSuccessMessage("Enquiry deleted successfully.");
+    } catch (deleteError) {
+      console.error("Delete enquiry error:", deleteError);
+      setError(deleteError.message || "Unable to delete enquiry.");
+    } finally {
+      setDeletingId("");
+    }
+  };
+
+  const packageOptions = useMemo(() => {
+    return [
+      ...new Set(
+        enquiries
+          .map((enquiry) => enquiry.packageName)
+          .filter(Boolean)
+          .sort()
+      ),
+    ];
+  }, [enquiries]);
+
+  const filteredEnquiries = useMemo(() => {
+    const normalizedSearch = searchText.trim().toLowerCase();
+
+    return enquiries.filter((enquiry) => {
+      const status = String(enquiry.status || "new").toLowerCase();
+      const packageName = String(enquiry.packageName || "");
+
+      const matchesSearch =
+        !normalizedSearch ||
+        [
+          enquiry.name,
+          enquiry.email,
+          enquiry.phone,
+          enquiry.packageName,
+          enquiry.message,
+          enquiry.travelMonth,
+          enquiry.adminNotes,
+        ].some((value) =>
+          String(value || "")
+            .toLowerCase()
+            .includes(normalizedSearch)
+        );
+
+      const matchesStatus =
+        statusFilter === "all" || status === statusFilter;
+
+      const matchesPackage =
+        packageFilter === "all" || packageName === packageFilter;
+
+      return matchesSearch && matchesStatus && matchesPackage;
+    });
+  }, [enquiries, searchText, statusFilter, packageFilter]);
+
   const summary = useMemo(() => {
-    const normalizedEnquiries = enquiries.map((enquiry) => ({
-      ...enquiry,
-      packageName: String(enquiry.packageName || "").toLowerCase(),
-      status: String(enquiry.status || "").toLowerCase(),
-    }));
+    const countByStatus = (status) =>
+      enquiries.filter(
+        (enquiry) =>
+          String(enquiry.status || "new").toLowerCase() === status
+      ).length;
 
     return {
-      total: normalizedEnquiries.length,
-      newCount: normalizedEnquiries.filter(
-        (enquiry) => enquiry.status === "new"
-      ).length,
-      discovery: normalizedEnquiries.filter((enquiry) =>
-        enquiry.packageName.includes("discovery")
-      ).length,
-      express: normalizedEnquiries.filter((enquiry) =>
-        enquiry.packageName.includes("express")
-      ).length,
+      total: enquiries.length,
+      newCount: countByStatus("new"),
+      contacted: countByStatus("contacted"),
+      confirmed: countByStatus("confirmed"),
+      closed: countByStatus("closed"),
     };
   }, [enquiries]);
 
-  const formatDate = (dateValue) => {
-    if (!dateValue) {
-      return "Not available";
+  const exportToCsv = () => {
+    if (filteredEnquiries.length === 0) {
+      setError("There are no enquiries to export.");
+      return;
     }
 
-    const parsedDate = new Date(dateValue);
+    const headers = [
+      "Name",
+      "Phone",
+      "Email",
+      "Package",
+      "Travelers",
+      "Travel Month",
+      "Message",
+      "Status",
+      "Admin Notes",
+      "Created At",
+      "Updated At",
+    ];
 
-    if (Number.isNaN(parsedDate.getTime())) {
-      return String(dateValue);
-    }
+    const rows = filteredEnquiries.map((enquiry) => [
+      enquiry.name,
+      enquiry.phone,
+      enquiry.email,
+      enquiry.packageName,
+      enquiry.travelers,
+      enquiry.travelMonth,
+      enquiry.message,
+      enquiry.status,
+      enquiry.adminNotes,
+      enquiry.createdAt,
+      enquiry.updatedAt,
+    ]);
 
-    return new Intl.DateTimeFormat("en-IN", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(parsedDate);
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map(escapeCsvValue).join(","))
+      .join("\n");
+
+    const csvBlob = new Blob([`\uFEFF${csvContent}`], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const downloadUrl = URL.createObjectURL(csvBlob);
+    const downloadLink = document.createElement("a");
+
+    downloadLink.href = downloadUrl;
+    downloadLink.download = `europe-tourz-enquiries-${new Date()
+      .toISOString()
+      .slice(0, 10)}.csv`;
+
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+
+    URL.revokeObjectURL(downloadUrl);
   };
 
-  const handleLogout = () => {
-    logoutAdmin();
+  const clearFilters = () => {
+    setSearchText("");
+    setStatusFilter("all");
+    setPackageFilter("all");
   };
 
   return (
     <section className="min-h-screen bg-[#070b14] px-4 py-12 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+        <header className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-yellow-400">
               Europe Tourz Admin
             </p>
 
             <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
-              Customer Enquiries
+              Enquiry Management
             </h1>
 
             <p className="mt-3 max-w-2xl text-gray-400">
-              Review customer enquiries submitted through the website.
+              Search, manage, update and export customer enquiries.
             </p>
           </div>
 
@@ -146,260 +355,374 @@ function AdminEnquiries() {
               type="button"
               onClick={() => fetchEnquiries(true)}
               disabled={refreshing}
-              className="rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold transition hover:bg-white/10 disabled:opacity-60"
             >
               {refreshing ? "Refreshing..." : "Refresh"}
             </button>
 
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={exportToCsv}
+              className="rounded-xl border border-green-400/30 bg-green-400/10 px-5 py-3 text-sm font-semibold text-green-300 transition hover:bg-green-400/20"
+            >
+              Export CSV
+            </button>
+
+            <button
+              type="button"
+              onClick={logoutAdmin}
               className="rounded-xl bg-yellow-400 px-5 py-3 text-sm font-bold text-black transition hover:bg-yellow-300"
             >
               Logout
             </button>
           </div>
+        </header>
+
+        <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          <SummaryCard label="Total" value={summary.total} />
+          <SummaryCard label="New" value={summary.newCount} />
+          <SummaryCard label="Contacted" value={summary.contacted} />
+          <SummaryCard label="Confirmed" value={summary.confirmed} />
+          <SummaryCard label="Closed" value={summary.closed} />
         </div>
 
-        <div className="mb-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <SummaryCard label="Total Enquiries" value={summary.total} />
-          <SummaryCard label="New Enquiries" value={summary.newCount} />
-          <SummaryCard
-            label="Grand Europe Discovery"
-            value={summary.discovery}
-          />
-          <SummaryCard label="Grand Europe Express" value={summary.express} />
+        <div className="mb-8 grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="xl:col-span-2">
+            <label
+              htmlFor="search"
+              className="mb-2 block text-sm font-medium text-gray-300"
+            >
+              Search enquiries
+            </label>
+
+            <input
+              id="search"
+              type="search"
+              value={searchText}
+              onChange={(event) => setSearchText(event.target.value)}
+              placeholder="Search name, email, phone, package or notes"
+              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none placeholder:text-gray-500 focus:border-yellow-400"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="status-filter"
+              className="mb-2 block text-sm font-medium text-gray-300"
+            >
+              Status
+            </label>
+
+            <select
+              id="status-filter"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-[#111827] px-4 py-3 text-white outline-none focus:border-yellow-400"
+            >
+              <option value="all">All statuses</option>
+              {STATUS_OPTIONS.map((status) => (
+                <option key={status} value={status}>
+                  {capitalize(status)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="package-filter"
+              className="mb-2 block text-sm font-medium text-gray-300"
+            >
+              Package
+            </label>
+
+            <select
+              id="package-filter"
+              value={packageFilter}
+              onChange={(event) => setPackageFilter(event.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-[#111827] px-4 py-3 text-white outline-none focus:border-yellow-400"
+            >
+              <option value="all">All packages</option>
+
+              {packageOptions.map((packageName) => (
+                <option key={packageName} value={packageName}>
+                  {packageName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="md:col-span-2 xl:col-span-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-gray-400">
+              Showing {filteredEnquiries.length} of {enquiries.length} enquiries
+            </p>
+
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="text-sm font-semibold text-yellow-300 hover:text-yellow-200"
+            >
+              Clear filters
+            </button>
+          </div>
         </div>
 
         {error && (
-          <div className="mb-8 rounded-2xl border border-red-400/30 bg-red-400/10 p-5 text-red-300">
+          <div className="mb-6 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-red-300">
             {error}
           </div>
         )}
 
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl">
-          {loading ? (
-            <div className="p-12 text-center text-gray-400">
-              Loading enquiries...
-            </div>
-          ) : enquiries.length === 0 ? (
-            <div className="p-12 text-center">
-              <h2 className="text-xl font-semibold text-white">
-                No enquiries found
-              </h2>
+        {successMessage && (
+          <div className="mb-6 rounded-2xl border border-green-400/30 bg-green-400/10 p-4 text-green-300">
+            {successMessage}
+          </div>
+        )}
 
-              <p className="mt-2 text-gray-400">
-                New customer enquiries will appear here.
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="hidden overflow-x-auto lg:block">
-                <table className="min-w-full divide-y divide-white/10">
-                  <thead className="bg-black/20">
-                    <tr>
-                      <TableHeading>Customer</TableHeading>
-                      <TableHeading>Contact</TableHeading>
-                      <TableHeading>Package</TableHeading>
-                      <TableHeading>Travel details</TableHeading>
-                      <TableHeading>Message</TableHeading>
-                      <TableHeading>Status</TableHeading>
-                      <TableHeading>Submitted</TableHeading>
-                    </tr>
-                  </thead>
-
-                  <tbody className="divide-y divide-white/10">
-                    {enquiries.map((enquiry) => (
-                      <tr
-                        key={enquiry.id}
-                        className="align-top transition hover:bg-white/[0.03]"
-                      >
-                        <TableCell>
-                          <p className="font-semibold text-white">
-                            {enquiry.name || "Not provided"}
-                          </p>
-                        </TableCell>
-
-                        <TableCell>
-                          <div className="space-y-1">
-                            <a
-                              href={
-                                enquiry.email
-                                  ? `mailto:${enquiry.email}`
-                                  : undefined
-                              }
-                              className="block text-yellow-300 hover:underline"
-                            >
-                              {enquiry.email || "No email"}
-                            </a>
-
-                            <a
-                              href={
-                                enquiry.phone
-                                  ? `tel:${enquiry.phone}`
-                                  : undefined
-                              }
-                              className="block text-gray-300 hover:text-white"
-                            >
-                              {enquiry.phone || "No phone"}
-                            </a>
-                          </div>
-                        </TableCell>
-
-                        <TableCell>
-                          <p className="max-w-48 text-gray-200">
-                            {enquiry.packageName || "Not selected"}
-                          </p>
-                        </TableCell>
-
-                        <TableCell>
-                          <div className="space-y-1 text-gray-300">
-                            <p>
-                              Travelers: {enquiry.travelers || "Not provided"}
-                            </p>
-                            <p>
-                              Month: {enquiry.travelMonth || "Not provided"}
-                            </p>
-                          </div>
-                        </TableCell>
-
-                        <TableCell>
-                          <p className="max-w-64 whitespace-pre-wrap text-gray-300">
-                            {enquiry.message || "No message"}
-                          </p>
-                        </TableCell>
-
-                        <TableCell>
-                          <StatusBadge status={enquiry.status} />
-                        </TableCell>
-
-                        <TableCell>
-                          <p className="min-w-36 text-gray-400">
-                            {formatDate(enquiry.createdAt)}
-                          </p>
-                        </TableCell>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="grid gap-4 p-4 lg:hidden">
-                {enquiries.map((enquiry) => (
-                  <article
-                    key={enquiry.id}
-                    className="rounded-2xl border border-white/10 bg-black/20 p-5"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h2 className="text-lg font-bold text-white">
-                          {enquiry.name || "Unnamed customer"}
-                        </h2>
-
-                        <p className="mt-1 text-sm text-gray-400">
-                          {formatDate(enquiry.createdAt)}
-                        </p>
-                      </div>
-
-                      <StatusBadge status={enquiry.status} />
-                    </div>
-
-                    <div className="mt-5 space-y-3 text-sm">
-                      <DetailRow
-                        label="Email"
-                        value={enquiry.email || "Not provided"}
-                      />
-
-                      <DetailRow
-                        label="Phone"
-                        value={enquiry.phone || "Not provided"}
-                      />
-
-                      <DetailRow
-                        label="Package"
-                        value={enquiry.packageName || "Not selected"}
-                      />
-
-                      <DetailRow
-                        label="Travelers"
-                        value={enquiry.travelers || "Not provided"}
-                      />
-
-                      <DetailRow
-                        label="Travel month"
-                        value={enquiry.travelMonth || "Not provided"}
-                      />
-
-                      <DetailRow
-                        label="Message"
-                        value={enquiry.message || "No message"}
-                      />
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-
-        <div className="mt-8 rounded-2xl border border-green-400/20 bg-green-400/10 p-5 text-sm text-green-200">
-          Admin access is protected through backend JWT authentication. Tokens
-          expire automatically after the configured session period.
-        </div>
+        {loading ? (
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-12 text-center text-gray-400">
+            Loading enquiries...
+          </div>
+        ) : filteredEnquiries.length === 0 ? (
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-12 text-center">
+            <h2 className="text-xl font-semibold">No enquiries found</h2>
+            <p className="mt-2 text-gray-400">
+              Change your filters or wait for new customer enquiries.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6">
+            {filteredEnquiries.map((enquiry) => (
+              <EnquiryCard
+                key={enquiry.id}
+                enquiry={enquiry}
+                updating={updatingId === enquiry.id}
+                deleting={deletingId === enquiry.id}
+                onStatusChange={handleStatusChange}
+                onNotesSave={handleNotesSave}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
+function EnquiryCard({
+  enquiry,
+  updating,
+  deleting,
+  onStatusChange,
+  onNotesSave,
+  onDelete,
+}) {
+  const [notes, setNotes] = useState(enquiry.adminNotes || "");
+
+  useEffect(() => {
+    setNotes(enquiry.adminNotes || "");
+  }, [enquiry.adminNotes]);
+
+  return (
+    <article className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl">
+      <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+        <div>
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="text-2xl font-bold">
+              {enquiry.name || "Unnamed customer"}
+            </h2>
+
+            <StatusBadge status={enquiry.status} />
+          </div>
+
+          <p className="mt-2 text-sm text-gray-400">
+            Submitted {formatDate(enquiry.createdAt)}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <select
+            value={String(enquiry.status || "new").toLowerCase()}
+            onChange={(event) =>
+              onStatusChange(enquiry.id, event.target.value)
+            }
+            disabled={updating}
+            className="rounded-xl border border-white/10 bg-[#111827] px-4 py-2 text-sm text-white outline-none focus:border-yellow-400 disabled:opacity-60"
+          >
+            {STATUS_OPTIONS.map((status) => (
+              <option key={status} value={status}>
+                {capitalize(status)}
+              </option>
+            ))}
+          </select>
+
+          <button
+            type="button"
+            onClick={() => onDelete(enquiry)}
+            disabled={deleting}
+            className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-400/20 disabled:opacity-60"
+          >
+            {deleting ? "Deleting..." : "Delete"}
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <DetailItem label="Email">
+          {enquiry.email ? (
+            <a
+              href={`mailto:${enquiry.email}`}
+              className="text-yellow-300 hover:underline"
+            >
+              {enquiry.email}
+            </a>
+          ) : (
+            "Not provided"
+          )}
+        </DetailItem>
+
+        <DetailItem label="Phone">
+          {enquiry.phone ? (
+            <a
+              href={`tel:${enquiry.phone}`}
+              className="text-yellow-300 hover:underline"
+            >
+              {enquiry.phone}
+            </a>
+          ) : (
+            "Not provided"
+          )}
+        </DetailItem>
+
+        <DetailItem label="Package">
+          {enquiry.packageName || "Not selected"}
+        </DetailItem>
+
+        <DetailItem label="Travel details">
+          {enquiry.travelers || "Not provided"} traveler(s)
+          <br />
+          {enquiry.travelMonth || "Month not provided"}
+        </DetailItem>
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-5">
+        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          Customer message
+        </p>
+
+        <p className="mt-3 whitespace-pre-wrap text-gray-200">
+          {enquiry.message || "No message provided."}
+        </p>
+      </div>
+
+      <div className="mt-6">
+        <label
+          htmlFor={`notes-${enquiry.id}`}
+          className="mb-2 block text-sm font-semibold text-gray-300"
+        >
+          Internal admin notes
+        </label>
+
+        <textarea
+          id={`notes-${enquiry.id}`}
+          rows="3"
+          value={notes}
+          onChange={(event) => setNotes(event.target.value)}
+          placeholder="Add follow-up details, call notes or internal comments"
+          className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none placeholder:text-gray-500 focus:border-yellow-400"
+        />
+
+        <div className="mt-3 flex justify-end">
+          <button
+            type="button"
+            onClick={() => onNotesSave(enquiry.id, notes)}
+            disabled={updating}
+            className="rounded-xl bg-yellow-400 px-5 py-2.5 text-sm font-bold text-black transition hover:bg-yellow-300 disabled:opacity-60"
+          >
+            {updating ? "Saving..." : "Save Notes"}
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function SummaryCard({ label, value }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
       <p className="text-sm text-gray-400">{label}</p>
-      <p className="mt-3 text-3xl font-bold text-white">{value}</p>
+      <p className="mt-2 text-3xl font-bold">{value}</p>
     </div>
   );
 }
 
-function TableHeading({ children }) {
+function DetailItem({ label, children }) {
   return (
-    <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">
-      {children}
-    </th>
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+        {label}
+      </p>
+      <div className="mt-2 break-words text-gray-200">{children}</div>
+    </div>
   );
-}
-
-function TableCell({ children }) {
-  return <td className="px-5 py-5 text-sm">{children}</td>;
 }
 
 function StatusBadge({ status }) {
   const normalizedStatus = String(status || "new").toLowerCase();
 
-  const styles =
-    normalizedStatus === "new"
-      ? "border-yellow-400/30 bg-yellow-400/10 text-yellow-300"
-      : "border-green-400/30 bg-green-400/10 text-green-300";
+  const styles = {
+    new: "border-yellow-400/30 bg-yellow-400/10 text-yellow-300",
+    contacted: "border-blue-400/30 bg-blue-400/10 text-blue-300",
+    confirmed: "border-green-400/30 bg-green-400/10 text-green-300",
+    closed: "border-gray-400/30 bg-gray-400/10 text-gray-300",
+  };
 
   return (
     <span
-      className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold capitalize ${styles}`}
+      className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+        styles[normalizedStatus] || styles.new
+      }`}
     >
-      {normalizedStatus}
+      {capitalize(normalizedStatus)}
     </span>
   );
 }
 
-function DetailRow({ label, value }) {
-  return (
-    <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-        {label}
-      </p>
-      <p className="mt-1 whitespace-pre-wrap break-words text-gray-200">
-        {value}
-      </p>
-    </div>
-  );
+async function readJsonResponse(response) {
+  try {
+    return await response.json();
+  } catch {
+    return {};
+  }
+}
+
+function formatDate(dateValue) {
+  if (!dateValue) {
+    return "date unavailable";
+  }
+
+  const parsedDate = new Date(dateValue);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return String(dateValue);
+  }
+
+  return new Intl.DateTimeFormat("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(parsedDate);
+}
+
+function capitalize(value) {
+  const text = String(value || "");
+
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function escapeCsvValue(value) {
+  const normalizedValue = String(value ?? "").replace(/"/g, '""');
+  return `"${normalizedValue}"`;
 }
 
 export default AdminEnquiries;

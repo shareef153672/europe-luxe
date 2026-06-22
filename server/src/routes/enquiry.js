@@ -4,7 +4,9 @@ const authenticateAdmin = require("../middleware/auth");
 
 const router = express.Router();
 
-// Public route: website users can submit enquiries
+const allowedStatuses = ["new", "contacted", "confirmed", "closed"];
+
+// Public route: customers can submit enquiries
 router.post("/enquiry", async (req, res) => {
   try {
     const {
@@ -43,6 +45,8 @@ router.post("/enquiry", async (req, res) => {
       });
     }
 
+    const currentTime = new Date().toISOString();
+
     const newEnquiry = {
       name: name.trim(),
       phone: phone.trim(),
@@ -52,7 +56,9 @@ router.post("/enquiry", async (req, res) => {
       travelMonth: travelMonth ? travelMonth.trim() : "",
       message: message ? message.trim() : "",
       status: "new",
-      createdAt: new Date().toISOString(),
+      adminNotes: "",
+      createdAt: currentTime,
+      updatedAt: currentTime,
     };
 
     const docRef = await db.collection("enquiries").add(newEnquiry);
@@ -75,7 +81,7 @@ router.post("/enquiry", async (req, res) => {
   }
 });
 
-// Protected route: only authenticated admins can read enquiries
+// Protected route: fetch all enquiries
 router.get("/enquiries", authenticateAdmin, async (req, res) => {
   try {
     const snapshot = await db
@@ -99,6 +105,112 @@ router.get("/enquiries", authenticateAdmin, async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Unable to fetch enquiries.",
+    });
+  }
+});
+
+// Protected route: update enquiry status and internal notes
+router.patch("/enquiries/:id", authenticateAdmin, async (req, res) => {
+  try {
+    const enquiryId = req.params.id;
+    const { status, adminNotes } = req.body;
+
+    if (!enquiryId) {
+      return res.status(400).json({
+        success: false,
+        message: "Enquiry ID is required.",
+      });
+    }
+
+    if (status && !allowedStatuses.includes(status.toLowerCase())) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid status. Allowed statuses are new, contacted, confirmed, and closed.",
+      });
+    }
+
+    if (
+      adminNotes !== undefined &&
+      typeof adminNotes !== "string"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Admin notes must be text.",
+      });
+    }
+
+    const enquiryRef = db.collection("enquiries").doc(enquiryId);
+    const enquirySnapshot = await enquiryRef.get();
+
+    if (!enquirySnapshot.exists) {
+      return res.status(404).json({
+        success: false,
+        message: "Enquiry not found.",
+      });
+    }
+
+    const updates = {
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (status) {
+      updates.status = status.toLowerCase();
+    }
+
+    if (adminNotes !== undefined) {
+      updates.adminNotes = adminNotes.trim();
+    }
+
+    await enquiryRef.update(updates);
+
+    const updatedSnapshot = await enquiryRef.get();
+
+    return res.json({
+      success: true,
+      message: "Enquiry updated successfully.",
+      enquiry: {
+        id: updatedSnapshot.id,
+        ...updatedSnapshot.data(),
+      },
+    });
+  } catch (error) {
+    console.error("Update enquiry error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update enquiry.",
+    });
+  }
+});
+
+// Protected route: delete spam or test enquiries
+router.delete("/enquiries/:id", authenticateAdmin, async (req, res) => {
+  try {
+    const enquiryId = req.params.id;
+
+    const enquiryRef = db.collection("enquiries").doc(enquiryId);
+    const enquirySnapshot = await enquiryRef.get();
+
+    if (!enquirySnapshot.exists) {
+      return res.status(404).json({
+        success: false,
+        message: "Enquiry not found.",
+      });
+    }
+
+    await enquiryRef.delete();
+
+    return res.json({
+      success: true,
+      message: "Enquiry deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Delete enquiry error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to delete enquiry.",
     });
   }
 });

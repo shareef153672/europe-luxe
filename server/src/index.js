@@ -25,11 +25,8 @@ app.use(
 
       return callback(new Error("Not allowed by CORS"));
     },
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-    ],
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -55,6 +52,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Handle unknown API routes
 app.use("/api", (req, res) => {
   res.status(404).json({
     success: false,
@@ -62,6 +60,7 @@ app.use("/api", (req, res) => {
   });
 });
 
+// Central error handler
 app.use((err, req, res, next) => {
   console.error("Server error:", err);
 
@@ -69,6 +68,13 @@ app.use((err, req, res, next) => {
     return res.status(403).json({
       success: false,
       message: "Request origin is not allowed.",
+    });
+  }
+
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({
+      success: false,
+      message: "Request payload is too large.",
     });
   }
 
