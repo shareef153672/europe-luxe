@@ -6,8 +6,8 @@ function Footer() {
   return (
     <footer className="border-t border-white/10 bg-[#050811] text-white">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-          <div>
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+          <div className="lg:col-span-2">
             <Link to="/" className="inline-block">
               <p className="text-2xl font-bold text-yellow-400">
                 Europe Tourz
@@ -18,17 +18,27 @@ function Footer() {
               </p>
             </Link>
 
-            <p className="mt-5 max-w-sm leading-7 text-gray-400">
-              Curated European tour experiences with comfort, premium service
-              and personalised travel assistance.
+            <p className="mt-5 max-w-md leading-7 text-gray-400">
+              Curated European tour experiences with comfortable travel,
+              premium service, transparent planning and personalised customer
+              assistance.
             </p>
 
-            <a
-              href="mailto:info@europetourz.com"
-              className="mt-5 inline-block text-yellow-300 transition hover:text-yellow-200"
-            >
-              info@europetourz.com
-            </a>
+            <div className="mt-5 space-y-2">
+              <a
+                href="mailto:info@europetourz.com"
+                className="block text-yellow-300 transition hover:text-yellow-200"
+              >
+                info@europetourz.com
+              </a>
+
+              <Link
+                to="/contact"
+                className="inline-block text-sm text-gray-400 transition hover:text-white"
+              >
+                Send us an enquiry
+              </Link>
+            </div>
           </div>
 
           <div>
@@ -38,9 +48,10 @@ function Footer() {
 
             <nav className="mt-5 flex flex-col gap-3 text-gray-400">
               <FooterLink to="/">Home</FooterLink>
+              <FooterLink to="/about">About Us</FooterLink>
               <FooterLink to="/packages">Tour Packages</FooterLink>
+              <FooterLink to="/faq">FAQ</FooterLink>
               <FooterLink to="/contact">Contact Us</FooterLink>
-              <FooterLink to="/admin/login">Admin Login</FooterLink>
             </nav>
           </div>
 
@@ -66,12 +77,25 @@ function Footer() {
             </h2>
 
             <nav className="mt-5 flex flex-col gap-3 text-gray-400">
-              <FooterLink to="/privacy-policy">Privacy Policy</FooterLink>
-              <FooterLink to="/terms">Terms and Conditions</FooterLink>
+              <FooterLink to="/privacy-policy">
+                Privacy Policy
+              </FooterLink>
+
+              <FooterLink to="/terms">
+                Terms and Conditions
+              </FooterLink>
+
               <FooterLink to="/cancellation-policy">
                 Cancellation & Refund Policy
               </FooterLink>
-              <FooterLink to="/payment-policy">Payment Policy</FooterLink>
+
+              <FooterLink to="/payment-policy">
+                Payment Policy
+              </FooterLink>
+
+              <FooterLink to="/admin/login">
+                Admin Login
+              </FooterLink>
             </nav>
           </div>
         </div>
@@ -82,8 +106,31 @@ function Footer() {
               © {currentYear} Europe Tourz. All rights reserved.
             </p>
 
+            <div className="flex flex-wrap gap-x-5 gap-y-2">
+              <Link
+                to="/privacy-policy"
+                className="transition hover:text-yellow-300"
+              >
+                Privacy
+              </Link>
+
+              <Link
+                to="/terms"
+                className="transition hover:text-yellow-300"
+              >
+                Terms
+              </Link>
+
+              <Link
+                to="/cancellation-policy"
+                className="transition hover:text-yellow-300"
+              >
+                Refunds
+              </Link>
+            </div>
+
             <p>
-              Secure payments powered by trusted payment providers.
+              Secure payments through trusted payment providers.
             </p>
           </div>
         </div>

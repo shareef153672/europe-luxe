@@ -8,14 +8,17 @@ import Home from "./pages/Home";
 import Packages from "./pages/Packages";
 import PackageDetails from "./pages/PackageDetails";
 import Contact from "./pages/Contact";
-import AdminLogin from "./pages/AdminLogin";
-import AdminEnquiries from "./pages/AdminEnquiries";
-import Success from "./pages/Success";
+import About from "./pages/About";
+import FAQ from "./pages/FAQ";
 
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
 import CancellationPolicy from "./pages/CancellationPolicy";
 import PaymentPolicy from "./pages/PaymentPolicy";
+
+import AdminLogin from "./pages/AdminLogin";
+import AdminEnquiries from "./pages/AdminEnquiries";
+import Success from "./pages/Success";
 
 function PageTransition({ children }) {
   return (
@@ -69,6 +72,24 @@ function App() {
               element={
                 <PageTransition>
                   <Home />
+                </PageTransition>
+              }
+            />
+
+            <Route
+              path="/about"
+              element={
+                <PageTransition>
+                  <About />
+                </PageTransition>
+              }
+            />
+
+            <Route
+              path="/faq"
+              element={
+                <PageTransition>
+                  <FAQ />
                 </PageTransition>
               }
             />
