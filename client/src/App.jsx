@@ -1,15 +1,17 @@
+
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
 import Navbar from "./layout/Navbar";
 import Footer from "./layout/Footer";
+import WhatsAppButton from "./components/WhatsAppButton";
 
 import Home from "./pages/Home";
+import About from "./pages/About";
+import FAQ from "./pages/FAQ";
 import Packages from "./pages/Packages";
 import PackageDetails from "./pages/PackageDetails";
 import Contact from "./pages/Contact";
-import About from "./pages/About";
-import FAQ from "./pages/FAQ";
 
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
@@ -59,6 +61,8 @@ function AdminLoginRoute() {
 
 function App() {
   const location = useLocation();
+
+  const isAdminPage = location.pathname.startsWith("/admin");
 
   return (
     <>
@@ -183,6 +187,8 @@ function App() {
           </Routes>
         </AnimatePresence>
       </main>
+
+      {!isAdminPage && <WhatsAppButton />}
 
       <Footer />
     </>
