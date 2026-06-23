@@ -5,6 +5,7 @@ import Navbar from "./layout/Navbar";
 import Footer from "./layout/Footer";
 
 import SEO from "./components/SEO";
+import StructuredData from "./components/StructuredData";
 import WhatsAppButton from "./components/WhatsAppButton";
 
 import Home from "./pages/Home";
@@ -63,9 +64,10 @@ const location = useLocation();
 const isAdminPage = location.pathname.startsWith("/admin");
 
 return (
-<> <SEO /> <Navbar />
+<> <SEO /> <StructuredData />
 
-```
+  <Navbar />
+
   <main className="min-h-screen bg-[#070b14] pt-24">
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
