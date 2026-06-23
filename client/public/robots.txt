@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /success
+
+Sitemap: https://europetourz.com/sitemap.xml
