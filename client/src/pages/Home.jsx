@@ -3,6 +3,64 @@ import { motion } from "framer-motion";
 import { packages } from "../assets/data/packages";
 import { useCurrency } from "../context/CurrencyContext";
 
+const inclusions = [
+  "✈️ Flights",
+  "🏨 Hotels",
+  "🍳 Breakfast",
+  "📍 Sightseeing",
+  "🛂 Visa Assistance",
+];
+
+const trustBadges = [
+  "✅ 5000+ Happy Travelers",
+  "✅ Schengen Visa Assistance",
+  "✅ Tour Manager",
+  "✅ Fixed Departure Tours",
+  "✅ EMI Available",
+];
+
+const departures = [
+  {
+    tour: "Europe Grand Tour",
+    days: "12 Days",
+    departure: "15 Aug 2026",
+    price: "₹1,99,999",
+  },
+  {
+    tour: "Swiss & Paris",
+    days: "8 Days",
+    departure: "22 Aug 2026",
+    price: "₹1,49,999",
+  },
+  {
+    tour: "Europe Highlights",
+    days: "10 Days",
+    departure: "5 Sep 2026",
+    price: "₹1,79,999",
+  },
+];
+
+const dayTours = [
+  {
+    title: "Austria Highlights Day Tour",
+    description:
+      "Explore Melk Abbey, Hallstatt, Salzburg and scenic Austrian lake routes in a professionally guided day experience.",
+    icon: "🏔️",
+  },
+  {
+    title: "Budapest Day Tour",
+    description:
+      "Enjoy a full-day Budapest experience with guided city highlights, beautiful architecture and cultural sightseeing.",
+    icon: "🌉",
+  },
+  {
+    title: "Prague Day Tour",
+    description:
+      "Discover Prague’s old town charm, historic squares, castles and iconic European city views with guided assistance.",
+    icon: "🏰",
+  },
+];
+
 export default function Home() {
   const { convertPrice } = useCurrency();
 
@@ -16,64 +74,188 @@ export default function Home() {
           animate={{ scale: 1 }}
           transition={{ duration: 8 }}
           className="absolute inset-0 w-full h-full object-cover"
-          alt="Luxury Europe Tour"
+          alt="Europetourz Europe group tours"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#070b14] via-black/70 to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#070b14] via-black/75 to-black/45" />
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="relative z-10 max-w-5xl mx-auto pt-24"
+          className="relative z-10 max-w-6xl mx-auto pt-24"
         >
           <p className="text-yellow-400 uppercase tracking-[0.35em] text-sm mb-6">
-            Premium Europe Tour Packages
+            Europetourz Fixed Departure Tours
           </p>
 
-          <h1 className="text-5xl md:text-7xl font-serif tracking-wide leading-tight mb-6">
-            Discover Europe with Luxury, Comfort & Indian Hospitality
+          <h1 className="text-4xl md:text-7xl font-serif tracking-wide leading-tight mb-6">
+            Europe Group Tours from India – Guaranteed Departures 2026
           </h1>
 
-          <p className="text-gray-300 text-lg md:text-xl max-w-3xl mx-auto mb-10 leading-relaxed">
-            Explore Switzerland, Germany, Austria, Hungary, Czech Republic,
-            Slovakia, and Slovenia with 5-star hotels, Indian meals, private
-            luxury coach travel, and professional tour management.
+          <p className="text-gray-200 text-lg md:text-xl max-w-4xl mx-auto mb-6 leading-relaxed">
+            Visit Switzerland, Paris, Italy, Austria & more with Indian tour
+            managers.
           </p>
 
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            {inclusions.map((item) => (
+              <span
+                key={item}
+                className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-gray-100 backdrop-blur"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/packages"
+            <a
+              href="#upcoming-tours"
               className="px-10 py-5 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl font-semibold text-lg hover:scale-105 transition duration-300"
             >
-              Explore Packages
-            </Link>
+              View Upcoming Tours
+            </a>
 
-            <a
-              href="#why-choose-us"
+            <Link
+              to="/contact"
               className="px-10 py-5 bg-white/10 border border-white/20 rounded-2xl font-semibold text-lg hover:bg-white/20 transition duration-300"
             >
-              Why Choose Us
-            </a>
+              Contact Us
+            </Link>
           </div>
         </motion.div>
       </section>
 
-      {/* TRUST STATS */}
+      {/* TRUST BADGES */}
       <section className="relative z-20 max-w-7xl mx-auto px-6 md:px-8 -mt-24">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-6 md:p-8">
-          <StatCard number="7+" label="European Countries" />
-          <StatCard number="10+" label="Major Cities" />
-          <StatCard number="5★" label="Premium Hotel Comfort" />
-          <StatCard number="24/7" label="Tour Support" />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-6 md:p-8">
+          {trustBadges.map((badge) => (
+            <div
+              key={badge}
+              className="rounded-2xl border border-white/10 bg-black/20 p-5 text-center text-gray-100"
+            >
+              {badge}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* UPCOMING DEPARTURES */}
+      <section
+        id="upcoming-tours"
+        className="max-w-7xl mx-auto px-6 md:px-8 py-24"
+      >
+        <div className="text-center mb-12">
+          <p className="text-yellow-400 uppercase tracking-[0.3em] text-sm mb-4">
+            Upcoming Tour Departures
+          </p>
+
+          <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">
+            Fixed Departure Europe Tours 2026
+          </h2>
+
+          <p className="text-gray-400 max-w-3xl mx-auto text-lg leading-relaxed">
+            Reserve your seat for professionally managed Europe group tours with
+            planned departures, tour manager support and visa assistance.
+          </p>
+        </div>
+
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+          <div className="hidden md:grid grid-cols-5 bg-black/30 px-6 py-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+            <span>Tour</span>
+            <span>Days</span>
+            <span>Departure</span>
+            <span>Price</span>
+            <span>Action</span>
+          </div>
+
+          {departures.map((departure) => (
+            <div
+              key={departure.tour}
+              className="grid gap-4 border-t border-white/10 px-6 py-6 md:grid-cols-5 md:items-center"
+            >
+              <div>
+                <p className="text-xs uppercase tracking-wider text-gray-500 md:hidden">
+                  Tour
+                </p>
+                <p className="font-bold text-white">{departure.tour}</p>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-gray-500 md:hidden">
+                  Days
+                </p>
+                <p className="text-gray-300">{departure.days}</p>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-gray-500 md:hidden">
+                  Departure
+                </p>
+                <p className="text-gray-300">{departure.departure}</p>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-gray-500 md:hidden">
+                  Price
+                </p>
+                <p className="text-xl font-bold text-yellow-400">
+                  {departure.price}
+                </p>
+              </div>
+
+              <Link
+                to="/contact"
+                className="inline-flex justify-center rounded-xl bg-yellow-400 px-5 py-3 font-bold text-black transition hover:bg-yellow-300"
+              >
+                Book Seat Now
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* NEW MAIN MESSAGE */}
+      <section className="border-y border-white/10 bg-white/5">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-20 text-center">
+          <h2 className="text-3xl md:text-5xl font-serif font-bold leading-tight">
+            Explore Europe's most beautiful destinations with professionally
+            guided day tours, multi-day holidays, and group departures tailored
+            for travelers worldwide
+          </h2>
+        </div>
+      </section>
+
+      {/* DAY TOURS */}
+      <section className="max-w-7xl mx-auto px-6 md:px-8 py-24">
+        <div className="text-center mb-14">
+          <p className="text-yellow-400 uppercase tracking-[0.3em] text-sm mb-4">
+            Day Tour Activities
+          </p>
+
+          <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">
+            Guided Day Tours Across Europe
+          </h2>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-3">
+          {dayTours.map((tour) => (
+            <ExperienceCard
+              key={tour.title}
+              icon={tour.icon}
+              title={tour.title}
+              description={tour.description}
+            />
+          ))}
         </div>
       </section>
 
       {/* FEATURED PACKAGES */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 py-24">
+      <section className="max-w-7xl mx-auto px-6 md:px-8 pb-24">
         <div className="text-center mb-16">
           <p className="text-yellow-400 uppercase tracking-[0.3em] text-sm mb-4">
-            Our Signature Tours
+            Multi-day Tour Packages
           </p>
 
           <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">
@@ -196,8 +378,8 @@ export default function Home() {
                 description="Professional English/Hindi-speaking tour support."
               />
               <FeatureCard
-                title="5-Star Hotels"
-                description="Premium stays selected for comfort and convenience."
+                title="Premium Hotels"
+                description="Quality stays selected for comfort and convenience."
               />
             </div>
           </div>
@@ -205,7 +387,7 @@ export default function Home() {
           <div className="relative">
             <img
               src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3"
-              alt="Europe luxury travel"
+              alt="Europe guided travel"
               className="rounded-3xl w-full h-[650px] object-cover"
             />
 
@@ -220,45 +402,6 @@ export default function Home() {
                 comfortable long-distance travel across Europe.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* EXPERIENCE SECTION */}
-      <section className="bg-white/5 border-y border-white/10">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 py-24">
-          <div className="text-center mb-16">
-            <p className="text-yellow-400 uppercase tracking-[0.3em] text-sm mb-4">
-              Tour Experience
-            </p>
-
-            <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">
-              What You Can Expect
-            </h2>
-
-            <p className="text-gray-400 max-w-3xl mx-auto text-lg leading-relaxed">
-              Your journey combines snow mountains, scenic lakes, historic
-              cities, fairytale villages, river cruise options, Indian food, and
-              guided assistance.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <ExperienceCard
-              icon="🏔️"
-              title="Snow & Alps"
-              description="Mt. Titlis cable car, snow experience, glacier views, and optional skiing."
-            />
-            <ExperienceCard
-              icon="🏰"
-              title="Historic Cities"
-              description="Explore Prague, Vienna, Budapest, Salzburg, Munich, Zurich, and more."
-            />
-            <ExperienceCard
-              icon="🚐"
-              title="Comfort Travel"
-              description="Dedicated driver, private vehicle, luggage support, and smooth sightseeing."
-            />
           </div>
         </div>
       </section>
@@ -302,8 +445,8 @@ export default function Home() {
             </h2>
 
             <p className="text-gray-100 max-w-2xl mx-auto text-lg mb-10">
-              Explore our real Europe packages and choose the journey that fits
-              your travel plan, comfort expectation, and budget.
+              Explore Europetourz packages and choose the journey that fits your
+              travel plan, comfort expectation, and budget.
             </p>
 
             <Link
@@ -315,15 +458,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </div>
-  );
-}
-
-function StatCard({ number, label }) {
-  return (
-    <div className="text-center p-5">
-      <h3 className="text-4xl font-bold text-yellow-400 mb-2">{number}</h3>
-      <p className="text-gray-300">{label}</p>
     </div>
   );
 }
