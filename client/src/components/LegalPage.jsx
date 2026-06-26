@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 function LegalPage({
-  eyebrow = "Europe Tourz",
+  eyebrow = "Europetourz",
   title,
   description,
   lastUpdated,

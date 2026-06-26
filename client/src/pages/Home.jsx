@@ -65,61 +65,60 @@ export default function Home() {
   const { convertPrice } = useCurrency();
 
   return (
-    <div className="bg-[#070b14] text-white overflow-hidden">
-      {/* HERO SECTION */}
-      <section className="relative min-h-screen flex items-center justify-center text-center px-6">
+    <div className="overflow-hidden bg-[#070b14] text-white">
+      <section className="relative flex min-h-[860px] items-center justify-center px-6 pb-24 pt-40 text-center md:min-h-[900px] md:pt-44">
         <motion.img
           src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4"
-          initial={{ scale: 1.1 }}
+          initial={{ scale: 1.08 }}
           animate={{ scale: 1 }}
           transition={{ duration: 8 }}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
           alt="Europetourz Europe group tours"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#070b14] via-black/75 to-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#070b14] via-black/75 to-black/50" />
 
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 35 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="relative z-10 max-w-6xl mx-auto pt-24"
+          transition={{ duration: 0.9 }}
+          className="relative z-10 mx-auto max-w-6xl"
         >
-          <p className="text-yellow-400 uppercase tracking-[0.35em] text-sm mb-6">
+          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.35em] text-yellow-400 sm:text-sm">
             Europetourz Fixed Departure Tours
           </p>
 
-          <h1 className="text-4xl md:text-7xl font-serif tracking-wide leading-tight mb-6">
+          <h1 className="mx-auto mb-6 max-w-6xl font-serif text-4xl font-bold leading-[1.08] tracking-wide text-white sm:text-5xl md:text-6xl lg:text-7xl">
             Europe Group Tours from India – Guaranteed Departures 2026
           </h1>
 
-          <p className="text-gray-200 text-lg md:text-xl max-w-4xl mx-auto mb-6 leading-relaxed">
+          <p className="mx-auto mb-7 max-w-4xl text-lg leading-relaxed text-gray-200 md:text-xl">
             Visit Switzerland, Paris, Italy, Austria & more with Indian tour
             managers.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
+          <div className="mb-9 flex flex-wrap justify-center gap-3">
             {inclusions.map((item) => (
               <span
                 key={item}
-                className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-gray-100 backdrop-blur"
+                className="rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-medium text-gray-100 backdrop-blur"
               >
                 {item}
               </span>
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <a
               href="#upcoming-tours"
-              className="px-10 py-5 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl font-semibold text-lg hover:scale-105 transition duration-300"
+              className="rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-500 px-9 py-4 text-base font-semibold text-white transition duration-300 hover:scale-105 md:px-10 md:py-5 md:text-lg"
             >
               View Upcoming Tours
             </a>
 
             <Link
               to="/contact"
-              className="px-10 py-5 bg-white/10 border border-white/20 rounded-2xl font-semibold text-lg hover:bg-white/20 transition duration-300"
+              className="rounded-2xl border border-white/20 bg-white/10 px-9 py-4 text-base font-semibold text-white transition duration-300 hover:bg-white/20 md:px-10 md:py-5 md:text-lg"
             >
               Contact Us
             </Link>
@@ -127,13 +126,12 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* TRUST BADGES */}
-      <section className="relative z-20 max-w-7xl mx-auto px-6 md:px-8 -mt-24">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-6 md:p-8">
+      <section className="relative z-20 mx-auto max-w-7xl px-6 md:px-8">
+        <div className="-mt-16 grid gap-4 rounded-3xl border border-white/10 bg-[#0b101c]/95 p-5 shadow-2xl backdrop-blur-xl sm:grid-cols-2 md:p-6 lg:grid-cols-5">
           {trustBadges.map((badge) => (
             <div
               key={badge}
-              className="rounded-2xl border border-white/10 bg-black/20 p-5 text-center text-gray-100"
+              className="flex min-h-[92px] items-center justify-center rounded-2xl border border-white/10 bg-black/20 px-5 py-5 text-center text-base font-semibold leading-relaxed text-gray-100"
             >
               {badge}
             </div>
@@ -141,28 +139,27 @@ export default function Home() {
         </div>
       </section>
 
-      {/* UPCOMING DEPARTURES */}
       <section
         id="upcoming-tours"
-        className="max-w-7xl mx-auto px-6 md:px-8 py-24"
+        className="mx-auto max-w-7xl px-6 py-24 md:px-8"
       >
-        <div className="text-center mb-12">
-          <p className="text-yellow-400 uppercase tracking-[0.3em] text-sm mb-4">
+        <div className="mb-12 text-center">
+          <p className="mb-4 text-sm uppercase tracking-[0.3em] text-yellow-400">
             Upcoming Tour Departures
           </p>
 
-          <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">
+          <h2 className="mb-6 font-serif text-4xl font-bold md:text-6xl">
             Fixed Departure Europe Tours 2026
           </h2>
 
-          <p className="text-gray-400 max-w-3xl mx-auto text-lg leading-relaxed">
+          <p className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-400">
             Reserve your seat for professionally managed Europe group tours with
             planned departures, tour manager support and visa assistance.
           </p>
         </div>
 
         <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
-          <div className="hidden md:grid grid-cols-5 bg-black/30 px-6 py-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+          <div className="hidden grid-cols-5 bg-black/30 px-6 py-4 text-sm font-semibold uppercase tracking-wider text-gray-400 md:grid">
             <span>Tour</span>
             <span>Days</span>
             <span>Departure</span>
@@ -216,25 +213,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* NEW MAIN MESSAGE */}
       <section className="border-y border-white/10 bg-white/5">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 py-20 text-center">
-          <h2 className="text-3xl md:text-5xl font-serif font-bold leading-tight">
-            Explore Europe's most beautiful destinations with professionally
+        <div className="mx-auto max-w-7xl px-6 py-20 text-center md:px-8">
+          <h2 className="font-serif text-3xl font-bold leading-tight md:text-5xl">
+            Explore Europe’s most beautiful destinations with professionally
             guided day tours, multi-day holidays, and group departures tailored
-            for travelers worldwide
+            for travelers worldwide.
           </h2>
         </div>
       </section>
 
-      {/* DAY TOURS */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 py-24">
-        <div className="text-center mb-14">
-          <p className="text-yellow-400 uppercase tracking-[0.3em] text-sm mb-4">
+      <section className="mx-auto max-w-7xl px-6 py-24 md:px-8">
+        <div className="mb-14 text-center">
+          <p className="mb-4 text-sm uppercase tracking-[0.3em] text-yellow-400">
             Day Tour Activities
           </p>
 
-          <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">
+          <h2 className="mb-6 font-serif text-4xl font-bold md:text-6xl">
             Guided Day Tours Across Europe
           </h2>
         </div>
@@ -251,18 +246,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEATURED PACKAGES */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 pb-24">
-        <div className="text-center mb-16">
-          <p className="text-yellow-400 uppercase tracking-[0.3em] text-sm mb-4">
+      <section className="mx-auto max-w-7xl px-6 pb-24 md:px-8">
+        <div className="mb-16 text-center">
+          <p className="mb-4 text-sm uppercase tracking-[0.3em] text-yellow-400">
             Multi-day Tour Packages
           </p>
 
-          <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">
+          <h2 className="mb-6 font-serif text-4xl font-bold md:text-6xl">
             Featured Europe Packages
           </h2>
 
-          <p className="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
+          <p className="mx-auto max-w-2xl text-lg leading-relaxed text-gray-400">
             Choose from carefully planned Europe tours designed for comfort,
             sightseeing, Indian food preferences, and stress-free travel.
           </p>
@@ -272,23 +266,23 @@ export default function Home() {
           {packages.map((pkg) => (
             <div
               key={pkg.id}
-              className="group bg-white/5 border border-white/10 rounded-3xl overflow-hidden shadow-xl hover:-translate-y-2 hover:border-yellow-400/50 transition duration-300"
+              className="group overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl transition duration-300 hover:-translate-y-2 hover:border-yellow-400/50"
             >
               <div className="relative h-80 overflow-hidden">
                 <img
                   src={pkg.heroImage}
                   alt={pkg.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
+                  className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
 
-                <div className="absolute top-5 left-5 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full text-sm text-yellow-400 border border-white/10">
+                <div className="absolute left-5 top-5 rounded-full border border-white/10 bg-black/60 px-4 py-2 text-sm text-yellow-400 backdrop-blur-md">
                   ⭐ {pkg.rating} / 5
                 </div>
 
                 <div className="absolute bottom-6 left-6 right-6">
-                  <h3 className="text-3xl font-serif font-bold mb-3">
+                  <h3 className="mb-3 font-serif text-3xl font-bold">
                     {pkg.title}
                   </h3>
 
@@ -299,39 +293,39 @@ export default function Home() {
               </div>
 
               <div className="p-7">
-                <div className="flex flex-wrap gap-2 mb-5">
+                <div className="mb-5 flex flex-wrap gap-2">
                   {pkg.countries?.slice(0, 5).map((country) => (
                     <span
                       key={country}
-                      className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300"
+                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300"
                     >
                       {country}
                     </span>
                   ))}
 
                   {pkg.countries?.length > 5 && (
-                    <span className="px-3 py-1 rounded-full bg-yellow-400/10 border border-yellow-400/20 text-sm text-yellow-400">
+                    <span className="rounded-full border border-yellow-400/20 bg-yellow-400/10 px-3 py-1 text-sm text-yellow-400">
                       +{pkg.countries.length - 5} More
                     </span>
                   )}
                 </div>
 
-                <p className="text-gray-400 leading-relaxed mb-7 line-clamp-3">
+                <p className="mb-7 line-clamp-3 leading-relaxed text-gray-400">
                   {pkg.overview}
                 </p>
 
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-gray-500 text-sm">Starting from</p>
+                    <p className="text-sm text-gray-500">Starting from</p>
                     <p className="text-3xl font-bold text-yellow-400">
                       {convertPrice(pkg.price)}
                     </p>
-                    <p className="text-gray-500 text-sm">Per Person</p>
+                    <p className="text-sm text-gray-500">Per Person</p>
                   </div>
 
                   <Link
                     to={`/package/${pkg.id}`}
-                    className="px-6 py-4 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 font-semibold hover:scale-105 transition duration-300"
+                    className="rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-4 font-semibold transition duration-300 hover:scale-105"
                   >
                     View Details
                   </Link>
@@ -342,29 +336,28 @@ export default function Home() {
         </div>
       </section>
 
-      {/* WHY CHOOSE US */}
       <section
         id="why-choose-us"
-        className="max-w-7xl mx-auto px-6 md:px-8 pb-24"
+        className="mx-auto max-w-7xl px-6 pb-24 md:px-8"
       >
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <p className="text-yellow-400 uppercase tracking-[0.3em] text-sm mb-4">
+            <p className="mb-4 text-sm uppercase tracking-[0.3em] text-yellow-400">
               Why Travel With Us
             </p>
 
-            <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">
+            <h2 className="mb-6 font-serif text-4xl font-bold md:text-6xl">
               Designed for Indian Travelers Who Want Comfort in Europe
             </h2>
 
-            <p className="text-gray-400 text-lg leading-relaxed mb-8">
+            <p className="mb-8 text-lg leading-relaxed text-gray-400">
               Our Europe packages are planned with premium hotels, Indian meals,
               private coach travel, experienced drivers, and English/Hindi tour
               managers. From airport pickup to sightseeing coordination, we make
               the journey smooth and comfortable.
             </p>
 
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <FeatureCard
                 title="Private Luxury Coach"
                 description="Comfortable AC minibus or coach throughout the tour."
@@ -388,16 +381,16 @@ export default function Home() {
             <img
               src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3"
               alt="Europe guided travel"
-              className="rounded-3xl w-full h-[650px] object-cover"
+              className="h-[650px] w-full rounded-3xl object-cover"
             />
 
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-black/60 to-transparent" />
 
-            <div className="absolute bottom-8 left-8 right-8 bg-white/10 border border-white/15 backdrop-blur-xl rounded-3xl p-6">
-              <h3 className="text-2xl font-serif font-bold mb-3">
+            <div className="absolute bottom-8 left-8 right-8 rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur-xl">
+              <h3 className="mb-3 font-serif text-2xl font-bold">
                 Stress-Free Europe Experience
               </h3>
-              <p className="text-gray-300 leading-relaxed">
+              <p className="leading-relaxed text-gray-300">
                 Smooth border crossings, luggage assistance, guided tours, and
                 comfortable long-distance travel across Europe.
               </p>
@@ -406,19 +399,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* REVIEWS */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 py-24">
-        <div className="text-center mb-16">
-          <p className="text-yellow-400 uppercase tracking-[0.3em] text-sm mb-4">
+      <section className="mx-auto max-w-7xl px-6 py-24 md:px-8">
+        <div className="mb-16 text-center">
+          <p className="mb-4 text-sm uppercase tracking-[0.3em] text-yellow-400">
             Traveler Stories
           </p>
 
-          <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">
+          <h2 className="mb-6 font-serif text-4xl font-bold md:text-6xl">
             Loved by Our Guests
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid gap-6 md:grid-cols-3">
           <ReviewCard
             name="Amit Sharma"
             text="A complete Europe experience with Indian meals, smooth travel, and excellent guide support."
@@ -434,24 +426,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 pb-24">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-600 to-indigo-600 p-10 md:p-16 text-center">
+      <section className="mx-auto max-w-7xl px-6 pb-24 md:px-8">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-600 to-indigo-600 p-10 text-center md:p-16">
           <div className="absolute inset-0 bg-black/20" />
 
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-6xl font-serif font-bold mb-6">
+            <h2 className="mb-6 font-serif text-4xl font-bold md:text-6xl">
               Ready to Plan Your Europe Holiday?
             </h2>
 
-            <p className="text-gray-100 max-w-2xl mx-auto text-lg mb-10">
+            <p className="mx-auto mb-10 max-w-2xl text-lg text-gray-100">
               Explore Europetourz packages and choose the journey that fits your
               travel plan, comfort expectation, and budget.
             </p>
 
             <Link
               to="/packages"
-              className="inline-block px-10 py-5 bg-white text-black rounded-2xl font-semibold text-lg hover:scale-105 transition duration-300"
+              className="inline-block rounded-2xl bg-white px-10 py-5 text-lg font-semibold text-black transition duration-300 hover:scale-105"
             >
               View All Packages
             </Link>
@@ -464,28 +455,28 @@ export default function Home() {
 
 function FeatureCard({ title, description }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-      <h3 className="text-xl font-semibold mb-3 text-white">{title}</h3>
-      <p className="text-gray-400 leading-relaxed">{description}</p>
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+      <h3 className="mb-3 text-xl font-semibold text-white">{title}</h3>
+      <p className="leading-relaxed text-gray-400">{description}</p>
     </div>
   );
 }
 
 function ExperienceCard({ icon, title, description }) {
   return (
-    <div className="bg-[#070b14] border border-white/10 rounded-3xl p-8 text-center hover:-translate-y-2 hover:border-yellow-400/50 transition duration-300">
-      <div className="text-5xl mb-6">{icon}</div>
-      <h3 className="text-2xl font-serif font-bold mb-4">{title}</h3>
-      <p className="text-gray-400 leading-relaxed">{description}</p>
+    <div className="rounded-3xl border border-white/10 bg-[#070b14] p-8 text-center transition duration-300 hover:-translate-y-2 hover:border-yellow-400/50">
+      <div className="mb-6 text-5xl">{icon}</div>
+      <h3 className="mb-4 font-serif text-2xl font-bold">{title}</h3>
+      <p className="leading-relaxed text-gray-400">{description}</p>
     </div>
   );
 }
 
 function ReviewCard({ name, text }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-3xl p-8">
-      <p className="text-yellow-400 mb-4">★★★★★</p>
-      <p className="text-gray-300 leading-relaxed mb-6">“{text}”</p>
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+      <p className="mb-4 text-yellow-400">★★★★★</p>
+      <p className="mb-6 leading-relaxed text-gray-300">“{text}”</p>
       <p className="font-semibold text-white">{name}</p>
     </div>
   );
