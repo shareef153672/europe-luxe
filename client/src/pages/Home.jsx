@@ -40,6 +40,39 @@ const departures = [
   },
 ];
 
+const featuredDestinations = [
+  {
+    name: "Switzerland",
+    subtitle: "Alps, lakes and scenic train routes",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
+  },
+  {
+    name: "Paris",
+    subtitle: "Eiffel Tower, Seine and romantic city walks",
+    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
+  },
+  {
+    name: "Italy",
+    subtitle: "Rome, Venice, architecture and culture",
+    image: "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9",
+  },
+  {
+    name: "Austria",
+    subtitle: "Vienna, Salzburg, Hallstatt and alpine beauty",
+    image: "https://images.unsplash.com/photo-1516550893923-42d28e5677af",
+  },
+  {
+    name: "Prague",
+    subtitle: "Castles, old town charm and historic streets",
+    image: "https://images.unsplash.com/photo-1541849546-216549ae216d",
+  },
+  {
+    name: "Budapest",
+    subtitle: "Danube views, bridges and grand architecture",
+    image: "https://images.unsplash.com/photo-1549877452-9c387954fbc2",
+  },
+];
+
 const dayTours = [
   {
     title: "Austria Highlights Day Tour",
@@ -204,7 +237,7 @@ export default function Home() {
 
               <Link
                 to="/contact"
-                className="inline-flex justify-center rounded-xl bg-yellow-400 px-5 py-3 font-bold text-black transition hover:bg-yellow-300"
+                className="inline-flex justify-center rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 px-5 py-3 font-bold text-white transition hover:scale-105"
               >
                 Book Seat Now
               </Link>
@@ -220,6 +253,35 @@ export default function Home() {
             guided day tours, multi-day holidays, and group departures tailored
             for travelers worldwide.
           </h2>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-24 md:px-8">
+        <div className="mb-14 text-center">
+          <p className="mb-4 text-sm uppercase tracking-[0.3em] text-yellow-400">
+            Featured Destinations
+          </p>
+
+          <h2 className="mb-6 font-serif text-4xl font-bold md:text-6xl">
+            Europe’s Most Loved Places
+          </h2>
+
+          <p className="mx-auto max-w-3xl text-lg leading-relaxed text-gray-400">
+            From Swiss mountain landscapes to Parisian landmarks and Central
+            European old towns, Europetourz helps you experience Europe with
+            comfort, planning and personal assistance.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {featuredDestinations.map((destination) => (
+            <DestinationCard
+              key={destination.name}
+              name={destination.name}
+              subtitle={destination.subtitle}
+              image={destination.image}
+            />
+          ))}
         </div>
       </section>
 
@@ -324,7 +386,7 @@ export default function Home() {
                   </div>
 
                   <Link
-                    to={`/package/${pkg.id}`}
+                    to={"/package/" + pkg.id}
                     className="rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-4 font-semibold transition duration-300 hover:scale-105"
                   >
                     View Details
@@ -413,14 +475,17 @@ export default function Home() {
         <div className="grid gap-6 md:grid-cols-3">
           <ReviewCard
             name="Amit Sharma"
+            city="Bengaluru"
             text="A complete Europe experience with Indian meals, smooth travel, and excellent guide support."
           />
           <ReviewCard
             name="Priya Reddy"
+            city="Hyderabad"
             text="Loved Switzerland, Hallstatt, Prague, and Lake Bled. Very comfortable and well-planned."
           />
           <ReviewCard
             name="Rahul Mehta"
+            city="Mumbai"
             text="Best short Europe package. Covered many places comfortably without travel stress."
           />
         </div>
@@ -453,6 +518,39 @@ export default function Home() {
   );
 }
 
+function DestinationCard({ name, subtitle, image }) {
+  return (
+    <div className="group relative h-[360px] overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl">
+      <img
+        src={image}
+        alt={name + " Europe tour destination"}
+        className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent" />
+
+      <div className="absolute bottom-0 left-0 right-0 p-7">
+        <p className="mb-2 text-sm uppercase tracking-[0.25em] text-yellow-300">
+          Destination
+        </p>
+
+        <h3 className="mb-3 font-serif text-3xl font-bold text-white">
+          {name}
+        </h3>
+
+        <p className="leading-relaxed text-gray-200">{subtitle}</p>
+
+        <Link
+          to="/contact"
+          className="mt-5 inline-flex rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
+        >
+          Plan This Trip
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 function FeatureCard({ title, description }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
@@ -472,12 +570,22 @@ function ExperienceCard({ icon, title, description }) {
   );
 }
 
-function ReviewCard({ name, text }) {
+function ReviewCard({ name, city, text }) {
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+      <div className="mb-5 flex items-center gap-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 text-lg font-bold text-white">
+          {name.charAt(0)}
+        </div>
+
+        <div>
+          <p className="font-semibold text-white">{name}</p>
+          <p className="text-sm text-gray-500">{city}</p>
+        </div>
+      </div>
+
       <p className="mb-4 text-yellow-400">★★★★★</p>
-      <p className="mb-6 leading-relaxed text-gray-300">“{text}”</p>
-      <p className="font-semibold text-white">{name}</p>
+      <p className="leading-relaxed text-gray-300">“{text}”</p>
     </div>
   );
 }
